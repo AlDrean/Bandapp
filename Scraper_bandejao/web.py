@@ -18,28 +18,35 @@ def converte(old):
 def Refeicoes():
     URL = "https://www.prefeitura.unicamp.br/apps/site/cardapio.php"
     html_doc = urlopen(URL).read()
+    
     soup = BeautifulSoup(html_doc,"html.parser")
     data = []
+
+    #Carrega o link dos dias cujos cardápios estão disponíveis, e manda para o próximo parcer;
     for dataBox_dia in soup.find_all("a"):
         dia = converte(dataBox_dia.text.strip())
          
         URL = "https://www.prefeitura.unicamp.br/apps/site/cardapio.php?d={}".format(dia)
         html_doc = urlopen(URL).read()
         soup = BeautifulSoup(html_doc,"html.parser")
-        
+
+
+        #Carrego a informação do café da manhã e a qual a data;
         ObjCafeManha = soup.find("div", class_="fundo_cardapio")
         data.append({ 
             'Data': dia,
             'cafe': ObjCafeManha.text.strip()
         })
 
-    
+        #tratando as refeições
         for dataBox  in soup.find_all("table", class_="fundo_cardapio"):
             refeicao = dataBox.text.strip()
             ArrozIntegral = refeicao.count('ARROZ INTEGRAL')
             Arroz =  refeicao.count('ARROZ')
             Feijao  = refeicao.count('FEIJ\u00c3O')
             
+
+            #Scrap em si. Corte das strings relacionadas a cada uma das sessões.
             if refeicao.find('\n\n\n PTS')!= -1:
                 PratoPrincipal = refeicao[refeicao.find('PRATO PRINCIPAL')+18:refeicao.find('\n\n\n PTS')].replace('\n\n\n',' ')
             else:
@@ -78,8 +85,9 @@ def Refeicoes():
     return jsonify({'Bandejao': data})  
 
 ##########################################################################################3
+#OBS: Não consegui retornar para um Jsonify, por isso não fiz "reuso de código"
 
-
+##########################################################################################3
 
 @app.route('/api/v1/bandeco/<id_data>', methods=['GET'])
 def Refeicao_dia(id_data):
@@ -97,8 +105,11 @@ def Refeicao_dia(id_data):
         ArrozIntegral = refeicao.count('ARROZ INTEGRAL')
         Arroz =  refeicao.count('ARROZ')
         Feijao  = refeicao.count('FEIJ\u00c3O')
-        PratoPrincipal = refeicao[refeicao.find('PRATO PRINCIPAL')+18:refeicao.find('\n\n\n PTS')]
-        
+        if refeicao.find('\n\n\n PTS')!= -1:
+            PratoPrincipal = refeicao[refeicao.find('PRATO PRINCIPAL')+18:refeicao.find('\n\n\n PTS')].replace('\n\n\n',' ')
+        else:
+            PratoPrincipal = refeicao[refeicao.find('PRATO PRINCIPAL')+18:refeicao.find('\n\n\nSALADA')].replace('\n\n\n','')
+
         if refeicao.find('PTS')!= -1: 
             Pts = refeicao[refeicao.find('PTS')+4:refeicao.find('\n\n\nSALADA:')]
         else:   
