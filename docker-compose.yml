@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  bandapp:
+    build: ./
+    command: uvicorn api.main:app --reload
+    ports:
+      - "8001:8000"
+    working_dir: /app
+    volumes:
+      - ./:/api
+
