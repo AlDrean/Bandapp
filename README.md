@@ -1,5 +1,5 @@
-andapp
-Simple FastAPI witch gives what the menu is for the week at Bandejao  UNICAMP
+Bandapp
+Simple FastAPI Api witch returns what is in the week's menu at Bandejao  UNICAMP
 
 Aplicativo levanta as refeições do bandejão de campinas <https://www.prefeitura.unicamp.br/cardapio/>
 
